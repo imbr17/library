@@ -1,0 +1,91 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Library Management System Schema
+
+model Book {
+  id          String   @id @default(cuid())
+  isbn        String?  @unique
+  title       String
+  author      String
+  publisher   String?
+  genre       String?
+  description String?
+  totalCopies Int      @default(1)
+  availableCopies Int @default(1)
+  publishedAt DateTime?
+  addedAt     DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  transactions Transaction[]
+  
+  @@map("books")
+}
+
+model Member {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  address   String?
+  joinDate  DateTime @default(now())
+  isActive  Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  transactions Transaction[]
+  
+  @@map("members")
+}
+
+model Transaction {
+  id         String     @id @default(cuid())
+  bookId     String
+  memberId   String
+  borrowDate DateTime   @default(now())
+  dueDate    DateTime
+  returnDate DateTime?
+  status     TransactionStatus @default(BORROWED)
+  fineAmount Float      @default(0)
+  notes      String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  
+  // Relations
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  @@map("transactions")
+}
+
+enum TransactionStatus {
+  BORROWED
+  RETURNED
+  OVERDUE
+  LOST
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      UserRole @default(LIBRARIAN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  LIBRARIAN
+  MEMBER
+}
