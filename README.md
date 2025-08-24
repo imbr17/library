@@ -30,6 +30,4 @@ npm start
 
  kill -9 PID
 
-
-#  library.railway.internal
-# library-production-61b6.up.railway.app
+ library-production-61b6.up.railway.app
